@@ -245,6 +245,19 @@ class clean_moodle_url extends \moodle_url {
                     self::log("Rewrite user profile");
                 }
             }
+
+            // Clean up user profile urls in forum posts
+            if ($path == "/mod/forum/user.php" && $params['id'] && $params['mode']) {
+                $slug = $DB->get_field('user', 'username', array('id' => $params['id']));
+                $slug = urlencode($slug);
+                $newpath = "/user/$slug";
+                if (!is_dir($CFG->dirroot . $newpath) && !is_file($CFG->dirroot . $newpath . ".php")) {
+                    $path = $newpath . '/' . $params['mode'];
+                    unset ($params['id']);
+                    unset ($params['mode']);
+                    self::log("Rewrite user profile");
+                }
+            }
         }
 
         // Ignore if clashes with a directory.
